@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QTabWidget" name="tabWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>791</width>
+      <height>531</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>生成器</string>
+     </attribute>
+     <widget class="QProgressBar" name="progressBar">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>450</y>
+        <width>631</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="value">
+       <number>24</number>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton">
+      <property name="geometry">
+       <rect>
+        <x>640</x>
+        <y>450</y>
+        <width>141</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>生成</string>
+      </property>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_2">
+      <property name="geometry">
+       <rect>
+        <x>420</x>
+        <y>10</y>
+        <width>361</width>
+        <height>201</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>题目输出格式</string>
+      </property>
+      <widget class="QCheckBox" name="checkBox">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>271</width>
+         <height>34</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>tex</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="checkBox_2">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>60</y>
+         <width>271</width>
+         <height>34</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>pdf</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="checkBox_3">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>90</y>
+         <width>271</width>
+         <height>34</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>txt</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_3">
+      <property name="geometry">
+       <rect>
+        <x>420</x>
+        <y>230</y>
+        <width>361</width>
+        <height>211</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>答案输出格式</string>
+      </property>
+      <widget class="QCheckBox" name="checkBox_4">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>271</width>
+         <height>34</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>txt</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>371</width>
+        <height>181</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>基础设置</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_4">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>140</y>
+        <width>111</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>题目数量</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="spinBox_3">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>140</y>
+        <width>101</width>
+        <height>41</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>40</y>
+        <width>121</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>最小数值范围</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="spinBox">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>43</y>
+        <width>101</width>
+        <height>41</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="spinBox_2">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>90</y>
+        <width>101</width>
+        <height>41</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>90</y>
+        <width>111</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>最大数值范围</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_2">
+     <attribute name="title">
+      <string>题型设置</string>
+     </attribute>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>36</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>帮助</string>
+    </property>
+    <addaction name="action"/>
+    <addaction name="separator"/>
+    <addaction name="action_2"/>
+   </widget>
+   <addaction name="menu"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="action">
+   <property name="text">
+    <string>使用帮助</string>
+   </property>
+  </action>
+  <action name="action_2">
+   <property name="text">
+    <string>关于</string>
+   </property>
+  </action>
+  <action name="action_4">
+   <property name="text">
+    <string>高级设置</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
