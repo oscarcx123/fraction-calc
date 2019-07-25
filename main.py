@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow
 
 import main_gui
 import about_gui
+import help_gui
 
 '''
 【分数题目类】
@@ -21,6 +22,7 @@ class Frac():
         self.high_range = int(kwargs["high_range"])
         self.ui = kwargs["ui"]
         self.get_calc_symbol()
+        self.additional_rules = False
         self.problems = {}
 
     def get_calc_symbol(self):
@@ -34,18 +36,45 @@ class Frac():
         if self.ui.checkBox_8.isChecked():
             self.symbol.append("/")
 
+    # 未启用的函数
+    def check_additional_rules(self):
+        checkbox_num = [9, 10, 11, 12, 13]
+        for num in checkbox_num:
+            eval(f"if self.ui.checkBox_{num}.isChecked(): self.additional_rules = True")
+
+    '''
+    分解质因数算法
+    来自：StackOverflow - Algorithm to find Largest prime factor of a number
+    '''
+    def factorization(self, n):
+        factors = []
+        d = 2
+        while n > 1:
+            while n % d == 0:
+                factors.append(d)
+                n /= d
+            d = d + 1
+            if d*d > n:
+                if n > 1: factors.append(n)
+                break
+        return factors
+
     def gen(self):
         cnt = 1
-        sector = 99 / len(self.symbol)
         while cnt <= self.amount:
-            rand_num = randint(0, 99)
-            for item in range(len(self.symbol)):
-                if rand_num > math.floor(item * sector):
-                    selected_symbol = self.symbol[item]
-            numerator_A = randint(self.low_range,self.high_range)
-            denominator_A = randint(self.low_range,self.high_range)
-            numerator_B = randint(self.low_range,self.high_range)
-            denominator_B = randint(self.low_range,self.high_range)
+            selected_symbol = self.symbol[randint(0, len(self.symbol) - 1)]
+            if selected_symbol == "+":
+                generated_num = self.addition()
+            if selected_symbol == "-":
+                generated_num = self.subtraction()
+            if selected_symbol == "*":
+                generated_num = self.multiplication()
+            if selected_symbol == "/":
+                generated_num = self.division()
+            numerator_A = generated_num["numerator_A"]
+            numerator_B = generated_num["numerator_B"]
+            denominator_A = generated_num["denominator_A"]
+            denominator_B = generated_num["denominator_B"]
             result = eval(f"Fraction(numerator_A, denominator_A) {selected_symbol} Fraction(numerator_B, denominator_B)")
             numerator_Ans = result.numerator
             denominator_Ans = result.denominator
@@ -58,6 +87,192 @@ class Frac():
             self.problems[cnt]["numerator_Ans"] = numerator_Ans
             self.problems[cnt]["denominator_Ans"] = denominator_Ans
             cnt += 1
+
+    def addition(self):
+        denominator_A = 0
+        denominator_B = 0
+        numerator_A = 0
+        numerator_B = 0
+        # 勾选1可以作为分母
+        if not self.ui.checkBox_13.isChecked() and self.low_range == 1:
+            denominator_A = randint(2, self.high_range)
+        else:
+            denominator_A = randint(self.low_range, self.high_range)
+        # 勾选同分母运算
+        if self.ui.checkBox_9.isChecked():
+            denominator_B = denominator_A
+        # 勾选分母有公因数
+        if self.ui.checkBox_10.isChecked():
+            # 对第一个分数的分母进行分解质因数
+            factors = self.factorization(denominator_A)
+            # factors为空，说明分母为1，此时无视“分母有公因数”这条规则
+            if factors == []:
+                denominator_B = randint(self.low_range,self.high_range)
+            else:
+                # 随机选择一个因子，计算出该因子可达的最大倍数，从而得出分母
+                selected_factor = factors[randint(0, len(factors) - 1)]
+                multiple = self.high_range // selected_factor
+                denominator_B = int(randint(1 , multiple) * selected_factor)
+        if denominator_B == 0:
+            denominator_B = randint(self.low_range,self.high_range)
+        # 勾选运算项均为真分数或1
+        if self.ui.checkBox_12.isChecked():
+            # 勾选答案不大于1（此时为“运算项均为真分数”的一个子情况）
+            if self.ui.checkBox_11.isChecked():
+                numerator_A = randint(1, math.floor(denominator_A / 2))
+                B_max_value = 1 - Fraction(numerator_A, denominator_A)
+                numerator_B_max = math.floor(denominator_B * B_max_value.numerator / B_max_value.denominator)
+                numerator_B = randint(1 , numerator_B_max)
+            else:
+                numerator_A = randint(self.low_range, denominator_A)
+                numerator_B = randint(self.low_range, denominator_B)
+        if numerator_A == 0:
+            numerator_A = randint(self.low_range,self.high_range)
+        if numerator_B == 0:
+            numerator_B = randint(self.low_range,self.high_range)
+        return {"numerator_A": numerator_A,
+                "numerator_B": numerator_B,
+                "denominator_A": denominator_A,
+                "denominator_B": denominator_B}
+
+    def subtraction(self):
+        denominator_A = 0
+        denominator_B = 0
+        numerator_A = 0
+        numerator_B = 0
+        # 勾选1可以作为分母
+        if not self.ui.checkBox_20.isChecked() and self.low_range == 1:
+            denominator_A = randint(2, self.high_range)
+        else:
+            denominator_A = randint(self.low_range, self.high_range)
+        # 勾选同分母运算
+        if self.ui.checkBox_16.isChecked():
+            denominator_B = denominator_A
+        # 勾选分母有公因数
+        if self.ui.checkBox_17.isChecked():
+            # 对第一个分数的分母进行分解质因数
+            factors = self.factorization(denominator_A)
+            # factors为空，说明分母为1，此时无视“分母有公因数”这条规则
+            if factors == []:
+                denominator_B = randint(self.low_range,self.high_range)
+            else:
+                # 随机选择一个因子，计算出该因子可达的最大倍数，从而得出分母
+                selected_factor = factors[randint(0, len(factors) - 1)]
+                multiple = self.high_range // selected_factor
+                denominator_B = int(randint(1 , multiple) * selected_factor)
+        if denominator_B == 0:
+            denominator_B = randint(self.low_range,self.high_range)
+        # 勾选运算项均为真分数或1
+        if self.ui.checkBox_19.isChecked():
+            numerator_A = randint(self.low_range, denominator_A)
+            numerator_B = randint(self.low_range, denominator_B)
+        if numerator_A == 0:
+            numerator_A = randint(self.low_range,self.high_range)
+        if numerator_B == 0:
+            numerator_B = randint(self.low_range,self.high_range)
+        # 勾选答案答案不为负数
+        if self.ui.checkBox_18.isChecked():
+            if Fraction(numerator_A, denominator_A) - Fraction(numerator_B, denominator_B) < 0:
+                numerator_A, numerator_B = numerator_B, numerator_A
+                denominator_A, denominator_B = denominator_B, denominator_A
+        return {"numerator_A": numerator_A,
+                "numerator_B": numerator_B,
+                "denominator_A": denominator_A,
+                "denominator_B": denominator_B}
+
+    def multiplication(self):
+        denominator_A = 0
+        denominator_B = 0
+        numerator_A = 0
+        numerator_B = 0
+        # 勾选1可以作为分母
+        if not self.ui.checkBox_23.isChecked() and self.low_range == 1:
+            denominator_A = randint(2, self.high_range)
+        else:
+            denominator_A = randint(self.low_range, self.high_range)
+        # 结果可以约分
+        if self.ui.checkBox_14.isChecked():
+            # 对第一个分数的分母进行分解质因数
+            factors = self.factorization(denominator_A)
+            # factors为空，说明分母为1，此时分母B无视“分母可以为1”这条规则
+            if factors == []:
+                if self.low_range == 1:
+                    denominator_B = randint(2,self.high_range)
+                else:
+                    denominator_B = randint(self.low_range,self.high_range)
+                factors_B = self.factorization(denominator_B)
+                selected_factor = factors_B[randint(0, len(factors_B) - 1)]
+                multiple = self.high_range // selected_factor
+                numerator_A = int(randint(1 , multiple) * selected_factor)
+            else:
+                # 随机选择一个因子，计算出该因子可达的最大倍数，从而得出可以约分的数字
+                selected_factor = factors[randint(0, len(factors) - 1)]
+                multiple = self.high_range // selected_factor
+                numerator_B = int(randint(1 , multiple) * selected_factor)
+                denominator_B = randint(self.low_range,self.high_range)
+                # 对第二个分数的分母进行分解质因数
+                factors_B = self.factorization(denominator_B)
+                if factors_B != []:
+                    selected_factor = factors_B[randint(0, len(factors_B) - 1)]
+                    multiple = self.high_range // selected_factor
+                    numerator_A = int(randint(1 , multiple) * selected_factor)
+        if denominator_B == 0:
+            denominator_B = randint(self.low_range,self.high_range)
+        if numerator_A == 0:
+            numerator_A = randint(self.low_range,self.high_range)
+        if numerator_B == 0:
+            numerator_B = randint(self.low_range,self.high_range)
+        return {"numerator_A": numerator_A,
+                "numerator_B": numerator_B,
+                "denominator_A": denominator_A,
+                "denominator_B": denominator_B}
+
+    def division(self):
+        denominator_A = 0
+        denominator_B = 0
+        numerator_A = 0
+        numerator_B = 0
+        # 勾选1可以作为分母
+        if not self.ui.checkBox_24.isChecked() and self.low_range == 1:
+            denominator_A = randint(2, self.high_range)
+        else:
+            denominator_A = randint(self.low_range, self.high_range)
+        # 结果可以约分
+        if self.ui.checkBox_21.isChecked():
+            # 对第一个分数的分母进行分解质因数
+            factors = self.factorization(denominator_A)
+            # factors为空，说明分母为1，此时分母B无视“分母可以为1”这条规则
+            if factors == []:
+                if self.low_range == 1:
+                    numerator_B = randint(2,self.high_range)
+                else:
+                    numerator_B = randint(self.low_range,self.high_range)
+                factors_B = self.factorization(numerator_B)
+                selected_factor = factors_B[randint(0, len(factors_B) - 1)]
+                multiple = self.high_range // selected_factor
+                numerator_A = int(randint(1 , multiple) * selected_factor)
+            else:
+                # 随机选择一个因子，计算出该因子可达的最大倍数，从而得出可以约分的数字
+                selected_factor = factors[randint(0, len(factors) - 1)]
+                multiple = self.high_range // selected_factor
+                denominator_B = int(randint(1 , multiple) * selected_factor)
+                numerator_B = randint(self.low_range,self.high_range)
+                # 对第二个分数的分母进行分解质因数
+                factors_B = self.factorization(numerator_B)
+                if factors_B != []:
+                    selected_factor = factors_B[randint(0, len(factors_B) - 1)]
+                    multiple = self.high_range // selected_factor
+                    numerator_A = int(randint(1 , multiple) * selected_factor)
+        if denominator_B == 0:
+            denominator_B = randint(self.low_range,self.high_range)
+        if numerator_A == 0:
+            numerator_A = randint(self.low_range,self.high_range)
+        if numerator_B == 0:
+            numerator_B = randint(self.low_range,self.high_range)
+        return {"numerator_A": numerator_A,
+                "numerator_B": numerator_B,
+                "denominator_A": denominator_A,
+                "denominator_B": denominator_B}
 
     def output(self):
         if self.ui.checkBox.isChecked():
@@ -159,6 +374,7 @@ class MainWin(QMainWindow):
     # 子窗口初始化（在这里创建实例，从而规避子窗口多开问题）
     def init_subwindow(self):
         self.about_window = About()
+        self.help_window = Help()
 
 
     # 图形界面数值的初始化
@@ -179,6 +395,7 @@ class MainWin(QMainWindow):
         # 绑定“生成器”页面的“生成”按钮到generate函数
         self.ui.pushButton.clicked.connect(self.generate)
         self.ui.action_2.triggered.connect(self.about_window.show_window)
+        self.ui.action.triggered.connect(self.help_window.show_window)
 
 
     # 在有配置文件的情况下，读取上次使用时的配置
@@ -207,6 +424,34 @@ class MainWin(QMainWindow):
         self.ui.checkBox_7.setChecked(conf["symbol_multiplication"])
         # 设置“出现除法运算”
         self.ui.checkBox_8.setChecked(conf["symbol_division"])
+        # 基础题型设置 > 加法设置 > 同分母运算
+        self.ui.checkBox_9.setChecked(conf["addition_same_denominator"])
+        # 基础题型设置 > 加法设置 > 分母有公因数
+        self.ui.checkBox_10.setChecked(conf["addition_denominator_has_common_factor"])
+        # 基础题型设置 > 加法设置 > 答案不大于1
+        self.ui.checkBox_11.setChecked(conf["addition_answer_within_one"])
+        # 基础题型设置 > 加法设置 > 运算项均为真分数或1
+        self.ui.checkBox_12.setChecked(conf["addition_proper_fraction"])
+        # 基础题型设置 > 加法设置 > 1可以作为分母
+        self.ui.checkBox_13.setChecked(conf["addition_one_as_denominator"])
+        # 基础题型设置 > 乘法设置 > 结果可以约分
+        self.ui.checkBox_14.setChecked(conf["multiplication_fraction_reduction"])
+        # 基础题型设置 > 减法设置 > 同分母运算
+        self.ui.checkBox_16.setChecked(conf["subtraction_same_denominator"])
+        # 基础题型设置 > 减法设置 > 分母有公因数
+        self.ui.checkBox_17.setChecked(conf["subtraction_denominator_has_common_factor"])
+        # 基础题型设置 > 减法设置 > 答案不为负数
+        self.ui.checkBox_18.setChecked(conf["subtraction_positive_answer"])
+        # 基础题型设置 > 减法设置 > 运算项均为真分数或1
+        self.ui.checkBox_19.setChecked(conf["subtraction_proper_fraction"])
+        # 基础题型设置 > 减法设置 > 1可以作为分母
+        self.ui.checkBox_20.setChecked(conf["subtraction_one_as_denominator"])
+        # 基础题型设置 > 除法设置 > 结果可以约分
+        self.ui.checkBox_21.setChecked(conf["division_fraction_reduction"])
+        # 基础题型设置 > 乘法设置 > 1可以作为分母
+        self.ui.checkBox_23.setChecked(conf["multiplication_one_as_denominator"])
+        # 基础题型设置 > 除法设置 > 1可以作为分母
+        self.ui.checkBox_24.setChecked(conf["division_one_as_denominator"])
 
     # 如果是初次运行，会加载默认配置
     def load_default_conf(self):
@@ -239,38 +484,41 @@ class MainWin(QMainWindow):
         conf["low_range"] = self.ui.spinBox.text()
         conf["high_range"] = self.ui.spinBox_2.text()
         conf["amount"] = self.ui.spinBox_3.text()
-        if self.ui.checkBox.isChecked():
-            conf["output_tex"] = True
-        else:
-            conf["output_tex"] = False
-        if self.ui.checkBox_2.isChecked():
-            conf["output_pdf"] = True
-        else:
-            conf["output_pdf"] = False
-        if self.ui.checkBox_3.isChecked():
-            conf["output_txt"] = True
-        else:
-            conf["output_txt"] = False
-        if self.ui.checkBox_4.isChecked():
-            conf["output_ans_txt"] = True
-        else:
-            conf["output_ans_txt"] = False
-        if self.ui.checkBox_5.isChecked():
-            conf["symbol_addition"] = True
-        else:
-            conf["symbol_addition"] = False
-        if self.ui.checkBox_6.isChecked():
-            conf["symbol_subtraction"] = True
-        else:
-            conf["symbol_subtraction"] = False
-        if self.ui.checkBox_7.isChecked():
-            conf["symbol_multiplication"] = True
-        else:
-            conf["symbol_multiplication"] = False
-        if self.ui.checkBox_8.isChecked():
-            conf["symbol_division"] = True
-        else:
-            conf["symbol_division"] = False
+        checkbox_dict = {
+            "checkBox": "output_tex",
+            "checkBox_2": "output_pdf",
+            "checkBox_3": "output_txt",
+            "checkBox_4": "output_ans_txt",
+            "checkBox_5": "symbol_addition",
+            "checkBox_6": "symbol_subtraction",
+            "checkBox_7": "symbol_multiplication",
+            "checkBox_8": "symbol_division",
+            "checkBox_9": "addition_same_denominator",
+            "checkBox_10": "addition_denominator_has_common_factor",
+            "checkBox_11": "addition_answer_within_one",
+            "checkBox_12": "addition_proper_fraction",
+            "checkBox_13": "addition_one_as_denominator",
+            "checkBox_14": "multiplication_fraction_reduction",
+            "checkBox_16": "subtraction_same_denominator",
+            "checkBox_17": "subtraction_denominator_has_common_factor",
+            "checkBox_18": "subtraction_positive_answer",
+            "checkBox_19": "subtraction_proper_fraction",
+            "checkBox_20": "subtraction_one_as_denominator",
+            "checkBox_21": "division_fraction_reduction",
+            "checkBox_23": "multiplication_one_as_denominator",
+            "checkBox_24": "division_one_as_denominator",
+        }
+
+        for box in checkbox_dict:
+            checkbox_command = (
+                f"if self.ui.{box}.isChecked():\n"
+                f"    conf['{checkbox_dict[box]}'] = True\n"
+                f"else:\n"
+                f"    conf['{checkbox_dict[box]}'] = False"
+            )
+            loc = locals()
+            exec(checkbox_command)
+            conf = loc['conf']
         with open(("conf.json"), "w") as f:
             json.dump(conf, f)
 
@@ -312,6 +560,12 @@ class SubWin(QMainWindow):
 class About(SubWin):
     def ui_init(self):
         self.ui = about_gui.Ui_Dialog()
+
+
+# “使用帮助”窗口
+class Help(SubWin):
+    def ui_init(self):
+        self.ui = help_gui.Ui_Dialog()
 
 if __name__ == '__main__':
     window = MainWin()

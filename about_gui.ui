@@ -18,7 +18,7 @@
     <rect>
      <x>9</x>
      <y>9</y>
-     <width>223</width>
+     <width>371</width>
      <height>33</height>
     </rect>
    </property>
@@ -28,7 +28,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Fraction-Calc V1.0</string>
+    <string>Fraction-Calc V0.3 （预览版）</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>

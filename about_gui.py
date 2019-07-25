@@ -15,7 +15,7 @@ class Ui_Dialog(object):
         Dialog.setObjectName("Dialog")
         Dialog.resize(429, 284)
         self.label = QtWidgets.QLabel(Dialog)
-        self.label.setGeometry(QtCore.QRect(9, 9, 223, 33))
+        self.label.setGeometry(QtCore.QRect(9, 9, 371, 33))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.label.setFont(font)
@@ -33,5 +33,5 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "关于"))
-        self.label.setText(_translate("Dialog", "Fraction-Calc V1.0"))
+        self.label.setText(_translate("Dialog", "Fraction-Calc V0.3 （预览版）"))
         self.label_2.setText(_translate("Dialog", "<html><head/><body><p>这是一个可以生成各种分数练习题的软件。目前本软件还在开发中，可能会有很多不完善的地方。</p><p>本软件使用PyQt5制作，GUI设计使用了Qt Designer。</p><p>本软件的开源协议是GNU v3。</p><p>软件作者：oscarcx123</p><p>项目地址：<a href=\"https://github.com/oscarcx123/fraction-calc\"><span style=\" text-decoration: underline; color:#0057ae;\">https://github.com/oscarcx123/fraction-calc</span></a></p><p><br/></p></body></html>"))
