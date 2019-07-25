@@ -2,6 +2,10 @@
 ## 简介
 使用PyQt5制作的分数练习题生成器。
 
+![FractionCalc_generator](./assets/img/FractionCalc_generator.png)
+
+![FractionCalc_basic_setting](./assets/img/FractionCalc_basic_setting.png)
+
 ## 发布文件
 
 之前尝试使用PyInstaller打包，可是生成的可执行文件太大了（50MB+），最后选择了Cython + gcc的方式打包。下载的时候选择对应的平台即可。
