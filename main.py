@@ -24,7 +24,26 @@ class Frac():
         self.get_calc_symbol()
         self.additional_rules = False
         self.problems = {}
+        self.prepare_progress_bar()
 
+    # 初始化计算进度条相关内容
+    def prepare_progress_bar(self):
+        self.current_step = 0
+        # 总步数最少为1，因为一定会执行“生成”题目这一过程
+        self.total_steps = 1
+        if self.ui.checkBox.isChecked():
+            self.total_steps += 1
+        if self.ui.checkBox_2.isChecked():
+            self.total_steps += 1
+        if self.ui.checkBox_3.isChecked():
+            self.total_steps += 1
+        if self.ui.checkBox_4.isChecked():
+            self.total_steps += 1
+        if not self.ui.checkBox_45.isChecked():
+            self.total_steps += 1
+
+
+    # 获取规定的四则运算符号
     def get_calc_symbol(self):
         self.symbol = []
         if self.ui.checkBox_5.isChecked():
@@ -36,11 +55,6 @@ class Frac():
         if self.ui.checkBox_8.isChecked():
             self.symbol.append("/")
 
-    # 未启用的函数
-    def check_additional_rules(self):
-        checkbox_num = [9, 10, 11, 12, 13]
-        for num in checkbox_num:
-            eval(f"if self.ui.checkBox_{num}.isChecked(): self.additional_rules = True")
 
     '''
     分解质因数算法
@@ -59,6 +73,8 @@ class Frac():
                 break
         return factors
 
+
+    # 生成题目和答案数据
     def gen(self):
         cnt = 1
         while cnt <= self.amount:
@@ -88,6 +104,8 @@ class Frac():
             self.problems[cnt]["denominator_Ans"] = denominator_Ans
             cnt += 1
 
+
+    # 生成加法题目
     def addition(self):
         denominator_A = 0
         denominator_B = 0
@@ -135,6 +153,8 @@ class Frac():
                 "denominator_A": denominator_A,
                 "denominator_B": denominator_B}
 
+
+    # 生成减法题目
     def subtraction(self):
         denominator_A = 0
         denominator_B = 0
@@ -180,6 +200,8 @@ class Frac():
                 "denominator_A": denominator_A,
                 "denominator_B": denominator_B}
 
+
+    # 生成乘法题目
     def multiplication(self):
         denominator_A = 0
         denominator_B = 0
@@ -227,6 +249,8 @@ class Frac():
                 "denominator_A": denominator_A,
                 "denominator_B": denominator_B}
 
+
+    # 生成除法题目
     def division(self):
         denominator_A = 0
         denominator_B = 0
@@ -274,15 +298,22 @@ class Frac():
                 "denominator_A": denominator_A,
                 "denominator_B": denominator_B}
 
+
+    # 根据用户勾选情况选择性输出内容
     def output(self):
         if self.ui.checkBox.isChecked():
             self.output_tex()
+            self.update_progress_bar()
         if self.ui.checkBox_2.isChecked():
             self.output_pdf()
+            self.update_progress_bar()
         if self.ui.checkBox_3.isChecked():
             self.output_txt()
+            self.update_progress_bar()
         if self.ui.checkBox_4.isChecked():
             self.output_ans_txt()
+            self.update_progress_bar()
+
 
     # txt格式输出题目
     def output_txt(self):
@@ -295,6 +326,7 @@ class Frac():
                     cnt += 1
                     linebreak += 1
                 f.write("\n")
+
 
     # tex格式输出题目
     def output_tex(self):
@@ -321,6 +353,7 @@ class Frac():
             f.write("\\end{alignat*}\n")
             f.write("\\end{document}\n")
     
+
     # 将tex文件转换成pdf（如果没有安装LaTeX，将无法转换，这里使用的是latexmk）
     def output_pdf(self):
         if os.path.exists("problems.tex"):
@@ -328,6 +361,7 @@ class Frac():
         else:
             self.output_tex()
             os.system("latexmk -pdf problems.tex")
+
 
     # txt格式输出答案
     def output_ans_txt(self):
@@ -340,18 +374,13 @@ class Frac():
                 else:
                     f.write("\t\t")
                 cnt += 1
+
     
-    # 用于清理中间生成的文件
-    def cleanup(self):
-        file_list = ["problems.aux",
-                     "problems.fdb_latexmk",
-                     "problems.fls",
-                     "problems.log"]
-        cnt = 0
-        while cnt < len(file_list):
-            if os.path.exists(file_list[cnt]):
-                os.remove(file_list[cnt])
-            cnt += 1
+    # 更新进度条
+    def update_progress_bar(self):
+        self.current_step += 1
+        self.ui.progressBar.setValue(math.floor(self.current_step * 100 / self.total_steps))
+
 
 '''
 【主窗口类】
@@ -367,6 +396,7 @@ class MainWin(QMainWindow):
         self.init_subwindow()
         self.init_interface()
         self.init_signal()
+        self.init_check()
         self.show()
         sys.exit(self.app.exec_())
 
@@ -381,6 +411,11 @@ class MainWin(QMainWindow):
     def init_interface(self):
         # 初始化“生成器”页面的进度条为0%
         self.ui.progressBar.setValue(0)
+        self.ui.spinBox.setMinimum(1)
+        self.ui.spinBox_2.setMinimum(1)
+        self.ui.spinBox.setMaximum(1000)
+        self.ui.spinBox_2.setMaximum(1000)
+        self.ui.spinBox_3.setMinimum(1)
         # 设置题目上限（目前没解决多页问题，因此限定100题）
         self.ui.spinBox_3.setMaximum(100)
         #【基础设置】初始化
@@ -396,6 +431,75 @@ class MainWin(QMainWindow):
         self.ui.pushButton.clicked.connect(self.generate)
         self.ui.action_2.triggered.connect(self.about_window.show_window)
         self.ui.action.triggered.connect(self.help_window.show_window)
+        self.ui.checkBox_5.clicked.connect(self.check_symbol)
+        self.ui.checkBox_6.clicked.connect(self.check_symbol)
+        self.ui.checkBox_7.clicked.connect(self.check_symbol)
+        self.ui.checkBox_8.clicked.connect(self.check_symbol)
+        self.ui.checkBox_2.clicked.connect(self.check_output)
+        self.ui.checkBox_11.clicked.connect(self.check_rules)
+        self.ui.checkBox_13.clicked.connect(self.check_rules)
+        self.ui.pushButton_3.clicked.connect(self.cleanup)
+        self.ui.pushButton_4.clicked.connect(self.remove_conf_file)
+        self.ui.pushButton_5.clicked.connect(self.remove_problems_and_answer)
+        
+
+    # 启动检查已勾选选项是否冲突
+    def init_check(self):
+        self.check_symbol()
+        self.check_output()
+        self.check_rules()
+
+    # 确保四则运算符号最少选中一个（只剩一个的时候会变成不可编辑）
+    def check_symbol(self):
+        check_group = [
+            "checkBox_5",
+            "checkBox_6",
+            "checkBox_7",
+            "checkBox_8",
+        ]
+        checked_symbol = []
+        for item in check_group:
+            command = (
+                f"if self.ui.{item}.isChecked():\n"
+                f"    checked_symbol.append(item)\n"
+            )
+            loc = locals()
+            exec(command)
+        if len(loc["checked_symbol"]) == 1:
+            command = f"self.ui.{loc['checked_symbol'][0]}.setDisabled(True)"
+            exec(command)
+        elif len(loc["checked_symbol"]) == 2:
+            for item in checked_symbol:
+                command = (
+                    f"if not self.ui.{item}.isEnabled():\n"
+                    f"    self.ui.{item}.setEnabled(True)\n"
+                )
+                exec(command)
+
+
+    # 检查输出格式
+    def check_output(self):
+        # 勾选PDF时必须勾选TEX
+        if self.ui.checkBox_2.isChecked():
+            if not self.ui.checkBox.isChecked():
+                self.ui.checkBox.setChecked(True)
+            self.ui.checkBox.setDisabled(True)
+        if not self.ui.checkBox_2.isChecked() and self.ui.checkBox.isChecked():
+            self.ui.checkBox.setEnabled(True)
+        
+
+    # 检查出题规则冲突
+    def check_rules(self):
+        if self.ui.checkBox_11.isChecked():
+            self.ui.checkBox_13.setChecked(False)
+            self.ui.checkBox_13.setDisabled(True)
+        else:
+            self.ui.checkBox_13.setEnabled(True)
+        if self.ui.checkBox_13.isChecked():
+            self.ui.checkBox_11.setChecked(False)
+            self.ui.checkBox_11.setDisabled(True)
+        else:
+            self.ui.checkBox_11.setEnabled(True)
 
 
     # 在有配置文件的情况下，读取上次使用时的配置
@@ -452,6 +556,8 @@ class MainWin(QMainWindow):
         self.ui.checkBox_23.setChecked(conf["multiplication_one_as_denominator"])
         # 基础题型设置 > 除法设置 > 1可以作为分母
         self.ui.checkBox_24.setChecked(conf["division_one_as_denominator"])
+        # 保留latemk生成的中间文件
+        self.ui.checkBox_45.setChecked(conf["keep_latexmk_file"])
 
     # 如果是初次运行，会加载默认配置
     def load_default_conf(self):
@@ -507,6 +613,7 @@ class MainWin(QMainWindow):
             "checkBox_21": "division_fraction_reduction",
             "checkBox_23": "multiplication_one_as_denominator",
             "checkBox_24": "division_one_as_denominator",
+            "checkBox_45": "keep_latexmk_file",
         }
 
         for box in checkbox_dict:
@@ -522,15 +629,45 @@ class MainWin(QMainWindow):
         with open(("conf.json"), "w") as f:
             json.dump(conf, f)
 
+    # 用于清理中间生成的文件
+    def cleanup(self):
+        file_list = ["problems.aux",
+                     "problems.fdb_latexmk",
+                     "problems.fls",
+                     "problems.log"]
+        for item in file_list:
+            if os.path.exists(item):
+                os.remove(item)
+
+    # 删除配置文件
+    def remove_conf_file(self):
+        if os.path.exists("conf.json"):
+            os.remove("conf.json")
+    
+    # 删除工作目录下的问题和答案
+    def remove_problems_and_answer(self):
+        file_list = ["problems.pdf",
+                     "problems.tex",
+                     "problems.txt",
+                     "answer.txt"]
+        for item in file_list:
+            if os.path.exists(item):
+                os.remove(item)
+
+    # “生成”操作
     def generate(self):
+        self.ui.progressBar.setValue(0)
         low_range = self.ui.spinBox.text()
         high_range = self.ui.spinBox_2.text()
         amount = self.ui.spinBox_3.text()
         self.save_conf()
         Practice = Frac(amount=amount, low_range=low_range, high_range=high_range, ui=self.ui)
         Practice.gen()
+        Practice.update_progress_bar()
         Practice.output()
-        Practice.cleanup()
+        if not self.ui.checkBox_45.isChecked():
+            self.cleanup()
+            Practice.update_progress_bar()
 
 
 '''
